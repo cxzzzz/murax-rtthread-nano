@@ -15,7 +15,7 @@ set(OBJCOPY /opt/rv32ima/bin/riscv32-unknown-elf-objcopy)
 set(OBJDUMP /opt/rv32ima/bin/riscv32-unknown-elf-objdump)
 
 # search for programs in the build host directories
-set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
 # for libraries and headers in the target directories
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
@@ -24,14 +24,14 @@ set(MABI  ilp32)
 set(MARCH rv32i)
 set(MODE    QEMU)
 
-set(LINKER_SCRIPT ./../src/linker.ld)
+set(LINKER_SCRIPT .././bsp/murax/linker.ld)
 #set(CMAKE_OUTPUT_DIRECTORY ./build)
 
 
 #设置编译flag
 set(CMAKE_C_FLAGS "-march=${MARCH}  -mabi=${MABI} -MD -fstrict-volatile-bitfields -fno-strict-aliasing -D${MODE}")
 
-set(LD_FLAGS "-march=${MARCH}  -mabi=${MABI} -nostdlib -lgcc -mcmodel=medany -nostartfiles -ffreestanding -Wl,-Bstatic,--print-memory-usage,-Map,${TARGETS}.map")
+set(LD_FLAGS "-march=${MARCH}  -mabi=${MABI} -lgcc -mcmodel=medany -nostartfiles -ffreestanding -Wl,-Bstatic,--print-memory-usage,-Map,${TARGETS}.map")
 set(CMAKE_EXE_LINKER_FLAGS ${LD_FLAGS})
 set(CMAKE_MODULE_LINKER_FLAGS ${LD_FLAGS})
 set(CMAKE_SHARED_LINKER_FLAGS ${LD_FLAGS})
@@ -47,15 +47,21 @@ enable_language( ASM )
 
 
 #src文件
-file(GLOB_RECURSE RT_SOURCE_FILES  "./rtthread_nano/*.c" "./rtthread_nano/*.S" )
-file(GLOB_RECURSE APP_SOURCE_FILES "./src/*.c" "./src/*.cpp" "src/*.S"  )
-add_executable(${TARGETS}.elf   ${APP_SOURCE_FILES} ${RT_SOURCE_FILES})
+file(GLOB_RECURSE RT_SOURCE_FILES  "./src/*.c" "./src/*.S" )
+file(GLOB_RECURSE BSP_SOURCE_FILES "./bsp/murax/libraries/*.c"  "./bsp/murax/libraries/*.S" "./bsp/murax/drivers/*.c"  "./libcpu/risc-v/common/*.c" "./libcpu/risc-v/common/*.S")
+file(GLOB_RECURSE APP_SOURCE_FILES "./bsp/murax/applications/*.c"  )
+file(GLOB_RECURSE FINSH_SOURCE_FILES  "./components/finsh/*.c" )
+add_executable(${TARGETS}.elf   ${FINSH_SOURCE_FILES} ${APP_SOURCE_FILES} ${RT_SOURCE_FILES} ${BSP_SOURCE_FILES} )
 
 
 #include路径
-include_directories( ./rtthread_nano/libcpu/risc-v/bumblebee ./rtthread_nano/libcpu/risc-v/common )
-include_directories( ./rtthread_nano/include ./rtthread_nano/include/libc ./rtthread_nano/ ./rtthread_nano/libcpu/risc-v/common)
-include_directories( ./src )
+#bsp
+include_directories( ./bsp/murax/ ./bsp/murax/libraries/murax/ ./bsp/murax/libraries/RISCV/ )
+#finsh
+include_directories( ./components/finsh/ )
+#rt-thread
+include_directories( ./include/  ./include/libc/ ./libcpu/risc-v/common/ )
+
 
 target_link_libraries(${TARGETS}.elf PRIVATE -T${LINKER_SCRIPT} )
 

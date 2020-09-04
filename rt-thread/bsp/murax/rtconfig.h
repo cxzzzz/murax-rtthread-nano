@@ -7,7 +7,7 @@
 // <h>Basic Configuration
 // <o>Maximal level of thread priority <8-256>
 //  <i>Default: 32
-#define RT_THREAD_PRIORITY_MAX  8
+#define RT_THREAD_PRIORITY_MAX  32
 // <o>OS tick per second
 //  <i>Default: 1000   (1ms)
 #define RT_TICK_PER_SECOND  100
@@ -24,6 +24,11 @@
 
 #define RT_USING_USER_MAIN
 
+#define RT_USING_FINSH
+#define FINSH_USING_SYMTAB
+#define FINSH_USING_MSH
+#define FINSH_USING_MSH_ONLY
+
 // <o>the size of main thread<1-4086>
 //  <i>Default: 512
 #define RT_MAIN_THREAD_STACK_SIZE     512
@@ -33,7 +38,7 @@
 // <h>Debug Configuration
 // <c1>enable kernel debug configuration
 //  <i>Default: enable kernel debug configuration
-//#define RT_DEBUG
+#define RT_DEBUG
 // </c>
 // <o>enable components initialization debug configuration<0-1>
 //  <i>Default: 0
@@ -113,7 +118,7 @@
 // <h>Console Configuration
 // <c1>Using console
 //  <i>Using console
-//#define RT_USING_CONSOLE
+#define RT_USING_CONSOLE
 // </c>
 // <o>the buffer size of console <1-1024>
 //  <i>the buffer size of console

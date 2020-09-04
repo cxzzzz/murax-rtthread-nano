@@ -2,7 +2,6 @@
 #include <rthw.h>
 #include <rtthread.h>
 
-#include "uart.h"
 #include "murax.h"
 
 #define _SCB_BASE       (0xE000E010UL)
@@ -72,6 +71,10 @@ void rt_hw_board_init()
 	TIMER_INTERRUPT->MASKS = 0x1;
 
 
+    //使能uart rx 中断(finsh并不需要)
+    //UART->STATUS = 2; //Enable RX interrupts
+
+
     /* Call components board initial (use INIT_BOARD_EXPORT()) */
 #ifdef RT_USING_COMPONENTS_INIT
     rt_components_board_init();
@@ -85,7 +88,8 @@ void rt_hw_board_init()
 
 void irqCallback(){
 
-	if(TIMER_INTERRUPT->PENDINGS & 1){  //Timer A interrupt
+    //timer中断
+    if(TIMER_INTERRUPT->PENDINGS & 1){  //Timer A interrupt
         //清除中断
         TIMER_INTERRUPT->PENDINGS = 1;
 
@@ -95,5 +99,31 @@ void irqCallback(){
 
         rt_interrupt_leave();
     }
+
+    //uart中断(finsh并不需要)
+    /*
+    while(UART->STATUS & (1 << 9)){ //UART RX interrupt
+		UART->DATA = ((UART->DATA) + 1) & 0xFF;
+	}
+    */
+    
 }
+
+void rt_hw_console_output(const char *str)
+{
+    /* empty console output */
+    while(*str){
+        uart_write(UART,*str);
+        str++;
+    }
+}
+
+char rt_hw_console_getchar(void)
+{
+    if( uart_readOccupancy( UART) )
+        return (UART->DATA) & 0xFF;
+    else 
+        return -1;
+}
+
 

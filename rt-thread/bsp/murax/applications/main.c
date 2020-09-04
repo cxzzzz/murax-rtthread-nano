@@ -46,6 +46,7 @@ void main(){
 
 	int ii=0;
 	println("hello world murax");
+	return ;
 
 	rt_thread_init(&static_thread1, "static1",
 		hello_cxzzzz,RT_NULL, 
